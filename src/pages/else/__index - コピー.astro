@@ -1,0 +1,35 @@
+---
+import "../styles/global.css";
+---
+
+<html lang="ja">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>Astro</title>
+	</head>
+<body class="min-h-screen bg-gray-100 flex flex-col justify-center items-center">
+    <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
+      <h1 class="text-2xl font-bold mb-6 text-center">疑似ログイン</h1>
+      <form id="login-form" class="flex flex-col gap-4">
+        <input type="text" id="username" placeholder="ユーザーネーム" class="border p-2 rounded" required />
+        <input type="email" id="email" placeholder="メールアドレス" class="border p-2 rounded" required />
+        <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">
+          ログイン
+        </button>
+      </form>
+    </div>
+
+    <script>
+      document.getElementById('login-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const email = document.getElementById('email').value;
+        const url = `/welcome?username=${encodeURIComponent(username)}&email=${encodeURIComponent(email)}`;
+        window.location.href = url;
+      });
+    </script>
+  </body>
+</html>

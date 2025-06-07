@@ -1,8 +1,38 @@
 ---
+// export const prerender = false;
+
+import "../styles/global.css";
+import fs from 'fs';
+import path from 'path';
+import matter from 'gray-matter';
+
+const postsDir = './src/content/posts';
+
+const files = fs.readdirSync(postsDir);
+const allPosts = files.map((file) => {
+  const fileContent = fs.readFileSync(path.join(postsDir, file), 'utf-8');
+  const { data } = matter(fileContent);
+  return {
+    ...data,
+  };
+});
+
+const tags = [...new Set(allPosts.flatMap(post => post.tags))];
+
+const selectedTag = Astro.url.searchParams.get('tag') || null;
+
+console.log("selectedTag:", selectedTag);
+console.log("allPosts:", allPosts); // ✅ ここ！
+
+const filteredPosts = selectedTag
+  ? allPosts.filter(post =>
+      Array.isArray(post.tags) && post.tags.includes(selectedTag)
+    )
+  : allPosts;
 
 ---
 
-<html lang="en">
+<html lang="ja">
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -10,7 +40,34 @@
 		<meta name="generator" content={Astro.generator} />
 		<title>Astro</title>
 	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
+
+  <body class="p-8 font-sans bg-gray-50 text-gray-800">
+    <h1 class="text-3xl font-bold mb-6">記事一覧</h1>
+
+    <!-- タグフィルター -->
+    <div class="mb-6 flex flex-wrap gap-2">
+      <a href="/" class="px-3 py-1 bg-blue-100 rounded hover:bg-blue-200">すべて</a>
+      {tags.map(tag => (
+        <a href={`/?tag=${tag}`} class="px-3 py-1 bg-blue-100 rounded hover:bg-blue-200">{tag}</a>
+      ))}
+    </div>
+
+    <!-- 一覧 -->
+    <ul class="space-y-4">
+      {filteredPosts.map(post => (
+        <li class="bg-white shadow p-4 rounded">
+          <a href={`/blog/${post.slug}`} class="text-xl font-semibold hover:underline">
+            {post.title}
+          </a>
+          <div class="text-sm text-gray-500">{post.date}</div>
+          <div class="flex gap-2 mt-2">
+            {post.tags.map(tag => (
+              <span class="px-2 py-1 bg-gray-200 rounded text-xs">{tag}</span>
+            ))}
+          </div>
+        </li>
+      ))}
+    </ul>
+  </body>
+
 </html>
