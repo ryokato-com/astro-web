@@ -1,6 +1,4 @@
 ---
-// export const prerender = false;
-
 import "../styles/global.css";
 import fs from 'fs';
 import path from 'path';
@@ -18,45 +16,38 @@ const allPosts = files.map((file) => {
 });
 
 const tags = [...new Set(allPosts.flatMap(post => post.tags))];
-
 const selectedTag = Astro.url.searchParams.get('tag') || null;
-
-console.log("selectedTag:", selectedTag);
-console.log("allPosts:", allPosts); // ✅ ここ！
 
 const filteredPosts = selectedTag
   ? allPosts.filter(post =>
       Array.isArray(post.tags) && post.tags.includes(selectedTag)
     )
   : allPosts;
-
 ---
 
 <html lang="ja">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-
+  <head>
+    <meta charset="utf-8" />
+    <title>記事一覧</title>
+  </head>
   <body class="p-8 font-sans bg-gray-50 text-gray-800">
     <h1 class="text-3xl font-bold mb-6">記事一覧</h1>
 
-    <!-- タグフィルター -->
-    <div class="mb-6 flex flex-wrap gap-2">
-      <a href="/" class="px-3 py-1 bg-blue-100 rounded hover:bg-blue-200">すべて</a>
+    <!-- タグボタン -->
+    <div class="mb-6 flex flex-wrap gap-2" id="tag-buttons">
+      <button data-tag="all" class="tag-button px-3 py-1 bg-blue-100 rounded hover:bg-blue-200">すべて</button>
       {tags.map(tag => (
-        <a href={`/?tag=${tag}`} class="px-3 py-1 bg-blue-100 rounded hover:bg-blue-200">{tag}</a>
+        <button class="tag-button px-3 py-1 bg-blue-100 rounded hover:bg-blue-200" data-tag={tag}>
+          {tag}
+        </button>
       ))}
     </div>
 
-    <!-- 一覧 -->
-    <ul class="space-y-4">
+    <!-- 投稿一覧 -->
+    <ul id="post-list" class="space-y-4">
       {filteredPosts.map(post => (
-        <li class="bg-white shadow p-4 rounded">
-          <a href={`/blog/${post.slug}`} class="text-xl font-semibold hover:underline">
+        <li class="bg-white shadow p-4 rounded post" data-tags={post.tags.join(',')}>
+          <a href={`/blog/${post.slug}`} class="text-xl font-semibold hover:underline block mb-1">
             {post.title}
           </a>
           <div class="text-sm text-gray-500">{post.date}</div>
@@ -68,6 +59,8 @@ const filteredPosts = selectedTag
         </li>
       ))}
     </ul>
-  </body>
 
+    <!-- JSを読み込み -->
+    <script src="/filter.js" is:inline></script>
+  </body>
 </html>

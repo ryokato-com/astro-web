@@ -4,10 +4,8 @@ import path from 'path';
 import matter from 'gray-matter';
 import { marked } from 'marked';
 
-const postsDir = './src/content/posts';
-
 export async function getStaticPaths() {
-  const postsDir = './src/content/posts';
+  const postsDir = './src/content/posts'; // ✅ ここで定義！
   const files = fs.readdirSync(postsDir);
   const paths = files.map(file => {
     const fileContent = fs.readFileSync(path.join(postsDir, file), 'utf-8');
@@ -17,11 +15,9 @@ export async function getStaticPaths() {
     };
   });
 
-  return paths; // ✅ ここがポイント！
+  return paths;
 }
 
-
-// 動的ページ読み込み処理
 const { slug } = Astro.params;
 const filePath = `./src/content/posts/${slug}.md`;
 const fileContent = fs.readFileSync(filePath, 'utf-8');
@@ -29,16 +25,14 @@ const { content, data } = matter(fileContent);
 const html = marked(content);
 ---
 
-
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
     <title>{data.title}</title>
   </head>
-  <body class="prose p-8 max-w-screen-md mx-auto">
-    <h1 class="text-2xl font-bold">{data.title}</h1>
-    <p class="text-sm text-gray-500">{data.date}</p>
+  <body class="prose p-8 max-w-screen-md mx-auto font-sans bg-white text-gray-900">
+    <h1 class="text-3xl font-bold mb-2">{data.title}</h1>
+    <p class="text-sm text-gray-500 mb-4">{data.date}</p>
     <div class="mt-4" set:html={html} />
   </body>
 </html>
-
